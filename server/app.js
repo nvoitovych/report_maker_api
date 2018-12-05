@@ -7,10 +7,12 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const publicRouter = require("./router/publicRouter");
-const adminRouter = require("./router/adminRouter");
-const privateRouter = require("./router/privateRouter");
+const publicRouter = require("../router/publicRouter");
+const adminRouter = require("../router/adminRouter");
+const privateRouter = require("../router/privateRouter");
+const CORS = require("middleware/CORS");
 
+app.use(CORS);
 app.use("/public-api", publicRouter);
 app.use("/admin-api", adminRouter);
 app.use("/private-api", privateRouter);

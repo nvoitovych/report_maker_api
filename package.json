@@ -4,7 +4,7 @@
   "description": "simple report maker api",
   "main": "config.js",
   "scripts": {
-    "start": "NODE_ENV=development node server/server.js",
+    "start": "export NODE_ENV=development node server/server.js",
     "migrate": "knex migrate:latest",
     "test": "NODE_ENV=development ./node_modules/.bin/mocha --reporter spec --exit"
   },
@@ -19,6 +19,7 @@
     "jsonwebtoken": "^8.3.0",
     "knex": "^0.15.1",
     "mysql": "^2.15.0",
+    "twitter": "^1.7.1",
     "twitter-node-client": "0.0.6"
   },
   "devDependencies": {

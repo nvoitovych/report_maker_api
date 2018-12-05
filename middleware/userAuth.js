@@ -1,6 +1,6 @@
 const BlueBird = require("bluebird");
 const jwt = BlueBird.promisifyAll(require("jsonwebtoken"));
-const config = require("../../config");
+const config = require("../config");
 
 // use for authorization in all functions under this URL
 module.exports = async (req, res, next) => {

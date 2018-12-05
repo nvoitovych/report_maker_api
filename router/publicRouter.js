@@ -3,7 +3,7 @@ const Joi = require("joi");
 const BlueBird = require("bluebird");
 const bcrypt = require("bcrypt");
 const jwt = BlueBird.promisifyAll(require("jsonwebtoken"));
-const config = require("../../config");
+const config = require("../config");
 const db = require("../db/db");
 
 const router = express.Router();

@@ -1,7 +1,7 @@
 const converter = require("../helpers/entityMapper");
 const env = process.env.NODE_ENV || "development";
 
-const config = require("../../knexfile")[env];
+const config = require("../knexfile")[env];
 const knex = require("knex")(config);
 
 exports.createUser = async (login, password) => {
@@ -155,7 +155,7 @@ const getReportById = exports.getReportById = async (reportId) => {
   return converter.reportJsonArrayToObjArray(resultReportJsonArray);
 };
 
-exports.createReport = async (reportArray, userId) => {
+exports.createReport = async (reportArray) => {
   const resultReportJsonArray = await knex("connection").insert(reportArray);
   return getReportByUserId(userId);
 };
