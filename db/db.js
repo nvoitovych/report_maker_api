@@ -1,5 +1,6 @@
 const converter = require("../helpers/entityMapper");
 const env = process.env.NODE_ENV || "development";
+const moment = require("moment");
 
 const config = require("../knexfile")[env];
 const knex = require("knex")(config);
@@ -10,12 +11,13 @@ exports.createUser = async (login, password) => {
   // trial license period
   const numberOfDaysToAdd = 5;
   endDate.setDate(endDate.getDate() + numberOfDaysToAdd);
-  const insertedUserId = await knex("user_credentials").insert({login: login,
+  const insertedUserId = await knex("user_credentials").insert({
+    login: login,
     password_hash: password,
     is_admin: false,
-    is_banned: false,
-    start_date: new Date(),
-    end_date: endDate
+    is_banned: false
+    // start_date: moment(new Date()).format("DD.MM.YYYY"),
+    // end_date: moment(endDate).format("DD.MM.YYYY")
   });
   return getUserById(insertedUserId);
 };

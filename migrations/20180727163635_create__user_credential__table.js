@@ -6,8 +6,8 @@ exports.up = (knex, Promise) => {
     table.string("password_hash").notNullable();
     table.string("username");
     table.string("email");
-    table.date("start_license");
-    table.date("end_license");
+    table.datetime("start_license");
+    table.datetime("end_license");
     table.string("access_secret");
     table.string("access_token");
     table.bool("is_banned");
