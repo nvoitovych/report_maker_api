@@ -157,7 +157,7 @@ const getReportById = exports.getReportById = async (reportId) => {
   return converter.reportJsonArrayToObjArray(resultReportJsonArray);
 };
 
-exports.createReport = async (reportArray) => {
+exports.createReport = async (reportArray, userId) => {
   const resultReportJsonArray = await knex("connection").insert(reportArray);
   return getReportByUserId(userId);
 };

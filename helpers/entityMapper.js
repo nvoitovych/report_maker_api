@@ -279,10 +279,22 @@ const reportObjToJson = exports.reportObjToJson = (reportObj) => {
     // return report JSON
     return {
       "report_id": reportObj.reportId,
-      "userId": reportObj.userId,
+      "user_id": reportObj.userId,
       "data": reportObj.data,
       "name": reportObj.name,
-      "createdAt": reportObj.createdAt
+      "created_at": reportObj.createdAt
+    };
+  }
+};
+
+const reportShortObjToJson = exports.reportShortObjToJson = (reportObj) => {
+  if (typeof reportObj !== "undefined") {
+    // return report JSON
+    return {
+      "user_id": reportObj.userId,
+      "data": reportObj.data,
+      "name": reportObj.name,
+      "created_at": reportObj.createdAt
     };
   }
 };

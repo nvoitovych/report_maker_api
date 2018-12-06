@@ -80,6 +80,8 @@ router.post("/", async (req, res) => {
 
   let reportArray = [];
   const week = "Week - {}-{}\n\n".format(startDate, endDate);
+  const linkToUserTwitterAccount = "https://twitter.com/" + twitterClient.getUser().screen_name;
+  const fullLinkToTweet = linkToUserTwitterAccount + "/status/";
   for (let connection in connectionArray) {
     const reportName = connection.hashTag + "__" + startDate + "-" + endDate;
     let reportData = "Twitter Campaign\n" + week;
@@ -100,8 +102,12 @@ router.post("/", async (req, res) => {
       return;
     }
 
+    let tweetArray = [];
+    let retweetArray = [];
+    let fullLinkToSourceOfRetweet = connection.twitterLink;
+
     for (let tweet in tweetsResult) {
-      let fullLnkToSourceOfRetweet = "";
+      let fullLinkToSourceOfRetweet = "";
       const createdAt = moment(tweet.created_at, "dd MMM DD HH:mm:ss ZZ YYYY", "en");
       const startDateFormated = moment(startDate).format("DD.MM.YYYY");
       const endDateFormated = moment(endDate).format("DD.MM.YYYY");
@@ -110,13 +116,60 @@ router.post("/", async (req, res) => {
 
         if (typeof (tweet.quoted_status) !== "undefined") {
           isRetweet = true;
-          fullLnkToSourceOfRetweet = "https://twitter.com/" + tweet.quoted_status.user.screen_name;
+          fullLinkToSourceOfRetweet = "https://twitter.com/" + tweet.quoted_status.user.screen_name;
         } else if (typeof (tweet.retweeted_status) !== "undefined") {
           isRetweet = true;
-          fullLnkToSourceOfRetweet = "https://twitter.com/" + tweet.retweeted_status.user.screen_name;
+          fullLinkToSourceOfRetweet = "https://twitter.com/" + tweet.retweeted_status.user.screen_name;
+        } else {
+          fullLinkToSourceOfRetweet = "";
+        }
+
+        for (let hashTag in tweet.entities["hashtags"]) {
+          if (!isRetweet && hashTag.text === connection.hashTag) {
+            tweetArray.push(tweet);
+          }
+        }
+
+        if (connection.twitterLink === fullLinkToSourceOfRetweet) {
+          retweetArray.push(tweet);
         }
       }
     }
+
+    for (let tweet in tweetArray) {
+      reportData += fullLinkToTweet + tweet.id;
+    }
+    reportData += "\n\nRetweets and Likes\n";
+    for (let retweet in retweetArray) {
+      if (typeof (retweet.retweeted_status) !== "undefined") {
+        reportData += fullLinkToSourceOfRetweet + "/status/" + retweet.retweeted_status.id_str;
+      } else {
+        reportData += fullLinkToSourceOfRetweet + "/status/" + retweet.quoted_status.id_str;
+      }
+    }
+
+    reportArray.push(converter.reportShortObjToJson({
+      "userId": req.app.locals.userId,
+      "data": reportData,
+      "name": reportName,
+      "createdAt": new Date()
+    }));
+  }
+  const reportResult = db.createReport(reportArray)
+    .catch(error => {
+      switch (error.code) {
+        default: {
+          res.status(500).send({
+            code: 500,
+            status: "INTERNAL_SERVER_ERROR",
+            message: "Internal server error"
+          });
+        }
+      }
+    });
+
+  if (typeof (reportResult) !== "undefined") {
+    res.status(200).send(reportResult);
   }
 });
 
