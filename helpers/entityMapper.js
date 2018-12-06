@@ -28,6 +28,7 @@ exports.userShortArrayForAdminObjToJson = (usersObjArray) => {
 const userJsonToObj = exports.userJsonToObj = (userJson) => {
   if (typeof userJson !== "undefined") {
     // return user credentials object
+    console.log(userJson.login);
     return {
       userId: userJson.user_id,
       login: userJson.login,

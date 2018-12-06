@@ -23,7 +23,7 @@ exports.createUser = async (login, password) => {
 };
 
 exports.updateUserLicense = async (userId, startDate, endDate) => {
-  const updatedUserId = await knex("user_credentials").insert({
+  const updatedUserId = await knex("user_credentials").update({
     start_date: startDate,
     end_date: endDate
   }).where({user_id: userId});
@@ -31,7 +31,7 @@ exports.updateUserLicense = async (userId, startDate, endDate) => {
 };
 
 exports.updateUser = async (userId, accessToken, secretToken, twitterLink, twitterUsername, twitterScreenName) => {
-  const updatedUserId = await knex("user_credentials").insert({
+  const updatedUserId = await knex("user_credentials").update({
     access_token: accessToken,
     secret_token: secretToken,
     twitter_link: twitterLink,
@@ -128,7 +128,7 @@ exports.createConnection = async (connection) => {
 };
 
 exports.updateConnectionById = async (connection, connectionId) => {
-  const updatedConnectionId = await knex("connection").insert({
+  const updatedConnectionId = await knex("connection").update({
     "connection_id": connection.connectionId,
     "user_id": connection.userId,
     "hash_tag": connection.hashTag,
@@ -163,7 +163,7 @@ exports.createReport = async (reportArray, userId) => {
 };
 
 exports.updateConnectionById = async (connection, connectionId) => {
-  const updatedConnectionId = await knex("connection").insert({
+  const updatedConnectionId = await knex("connection").update({
     "connection_id": connection.connectionId,
     "user_id": connection.userId,
     "hash_tag": connection.hashTag,

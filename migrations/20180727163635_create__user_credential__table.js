@@ -8,7 +8,7 @@ exports.up = (knex, Promise) => {
     table.string("email");
     table.datetime("start_license");
     table.datetime("end_license");
-    table.string("access_secret");
+    table.string("secret_token");
     table.string("access_token");
     table.bool("is_banned");
     table.bool("is_admin");
