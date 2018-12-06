@@ -13,6 +13,12 @@ function addBcryptType (err) {
   err.type = "bcryptError";
   throw err;
 }
+const CORS = require("../middleware/CORS");
+
+router.use(CORS);
+router.get("/routes", (req, res) => {
+  return res.status(200).send({"routes: ": router.stack});
+});
 
 router.post("/register", async (req, res) => {
   const login = req.body.login;
