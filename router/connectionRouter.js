@@ -30,10 +30,15 @@ router.post("/", async (req, res) => {
   const weekday = req.body.weekday;
   const reportType = req.body.reportType;
 
-  const hashTagSchema = Joi.object().keys({hashTag: Joi.string().alphanum().min(1).max(100).required()});
-  const linkToTwitterSchema = Joi.object().keys({linkToTwitter: Joi.string().alphanum().min(1).max(100).required()});
-  const weekdaySchema = Joi.object().keys({weekday: Joi.string().alphanum().min(1).max(30).required()});
-  const reportTypeSchema = Joi.object().keys({reportType: Joi.string().alphanum().min(1).max(30).required()});
+  // const hashTagSchema = Joi.object().keys({hashTag: Joi.string().alphanum().min(1).max(100).required()});
+  // const linkToTwitterSchema = Joi.object().keys({linkToTwitter: Joi.string().alphanum().min(1).max(100).required()});
+  // const weekdaySchema = Joi.object().keys({weekday: Joi.string().alphanum().min(1).max(30).required()});
+  // const reportTypeSchema = Joi.object().keys({reportType: Joi.string().alphanum().min(1).max(30).required()});
+
+  const hashTagSchema = Joi.object().keys({hashTag: Joi.string()});
+  const linkToTwitterSchema = Joi.object().keys({linkToTwitter: Joi.string()});
+  const weekdaySchema = Joi.object().keys({weekday: Joi.string()});
+  const reportTypeSchema = Joi.object().keys({reportType: Joi.string()});
 
   const hashTagValidationResult = Joi.validate({hashTag: hashTag}, hashTagSchema);
   const linkToTwitterValidationResult = Joi.validate({linkToTwitter: linkToTwitter}, linkToTwitterSchema);
@@ -45,10 +50,10 @@ router.post("/", async (req, res) => {
     res.status(400).send({code: 400, status: "BAD_REQUEST", message: "Invalid data sent"});
   } else {
     const connection = {
-      "userId": req.app.locals.userId,
-      "hashTag": hashTag,
-      "linkToTwitter": linkToTwitter,
-      "reportType": reportType,
+      "user_id": req.app.locals.userId,
+      "hash_tag": hashTag,
+      "link_to_twitter": linkToTwitter,
+      "report_type": reportType,
       "weekday": weekday
     };
     const resultConnection = await db.createConnection(connection)

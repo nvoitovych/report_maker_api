@@ -28,14 +28,13 @@ exports.userShortArrayForAdminObjToJson = (usersObjArray) => {
 const userJsonToObj = exports.userJsonToObj = (userJson) => {
   if (typeof userJson !== "undefined") {
     // return user credentials object
-    console.log(userJson.login);
     return {
       userId: userJson.user_id,
       login: userJson.login,
       passwordHash: userJson.password_hash,
       startLicense: userJson.start_license,
       endLicense: userJson.end_license,
-      accessSecret: userJson.access_secret,
+      accessSecret: userJson.secret_token,
       accessToken: userJson.access_token,
       isBanned: userJson.is_banned,
       isAdmin: userJson.is_admin,

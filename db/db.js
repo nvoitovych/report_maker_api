@@ -144,24 +144,6 @@ exports.deleteConnection = async (connectionId) => {
   return true;
 };
 
-/*
-  Report
- */
-const getReportByUserId = exports.getReportByUserId = async (userId) => {
-  const resultReportJsonArray = await knex("report").where({user_id: userId});
-  return converter.reportShortJsonArrayToObjArray(resultReportJsonArray);
-};
-
-const getReportById = exports.getReportById = async (reportId) => {
-  const resultReportJsonArray = await knex("connection").where({report_id: reportId});
-  return converter.reportJsonArrayToObjArray(resultReportJsonArray);
-};
-
-exports.createReport = async (reportArray, userId) => {
-  const resultReportJsonArray = await knex("connection").insert(reportArray);
-  return getReportByUserId(userId);
-};
-
 exports.updateConnectionById = async (connection, connectionId) => {
   const updatedConnectionId = await knex("connection").update({
     "connection_id": connection.connectionId,
@@ -172,6 +154,24 @@ exports.updateConnectionById = async (connection, connectionId) => {
     "weekday": connection.weekday
   }).where({connection_id: connectionId});
   return getUserConnectionById(updatedConnectionId);
+};
+
+/*
+  Report
+ */
+const getReportByUserId = exports.getReportByUserId = async (userId) => {
+  const resultReportJsonArray = await knex("report").where({user_id: userId});
+  return converter.reportShortJsonArrayToObjArray(resultReportJsonArray);
+};
+
+const getReportById = exports.getReportById = async (reportId) => {
+  const resultReportJsonArray = await knex("report").where({report_id: reportId});
+  return converter.reportJsonArrayToObjArray(resultReportJsonArray);
+};
+
+exports.createReport = async (reportArray, userId) => {
+  const resultReportJsonArray = await knex("report").insert(reportArray);
+  return getReportByUserId(userId);
 };
 
 exports.deleteReportById = async (reportId) => {

@@ -7,16 +7,20 @@ const moment = require("moment");
 const retrieveParams = require("../middleware/retrieveParams");
 const router = express.Router();
 const BlueBird = require("bluebird");
-const Twitter = BlueBird.promisifyAll(require("twitter")).Twitter;
+const Twitter = require("twit");
 
 router.post("/", async (req, res) => {
   const weekday = req.body.weekday;
   const startDate = req.body.startDate;
   const endDate = req.body.endDate;
 
-  const weekdaySchema = Joi.object().keys({weekday: Joi.string().alphanum().min(1).max(100).required()});
-  const startDateSchema = Joi.object().keys({startDate: Joi.string().alphanum().min(1).max(100).required()});
-  const endDateSchema = Joi.object().keys({endDate: Joi.string().alphanum().min(1).max(30).required()});
+  // const weekdaySchema = Joi.object().keys({weekday: Joi.string().alphanum().min(1).max(100).required()});
+  // const startDateSchema = Joi.object().keys({startDate: Joi.string().alphanum().min(1).max(100).required()});
+  // const endDateSchema = Joi.object().keys({endDate: Joi.string().alphanum().min(1).max(30).required()});
+
+  const weekdaySchema = Joi.object().keys({weekday: Joi.string().required()});
+  const startDateSchema = Joi.object().keys({startDate: Joi.string().required()});
+  const endDateSchema = Joi.object().keys({endDate: Joi.string().required()});
 
   const weekdayValidationResult = Joi.validate({weekday: weekday}, weekdaySchema);
   const startDateValidationResult = Joi.validate({startDate: startDate}, startDateSchema);
@@ -54,7 +58,7 @@ router.post("/", async (req, res) => {
     return;
   }
 
-  const connectionArray = db.getUserConnectionByWeekday(req.app.locals.userId, weekday)
+  const connectionArray = await db.getUserConnectionByWeekday(req.app.locals.userId, weekday)
     .catch(error => {
       switch (error.code) {
         default: {
@@ -74,43 +78,63 @@ router.post("/", async (req, res) => {
   const twitterClient = new Twitter({
     consumer_key: config.apiKey,
     consumer_secret: config.apiSecret,
-    access_token_key: resultUser.accessToken,
+    access_token: resultUser.accessToken,
     access_token_secret: resultUser.accessSecret
   });
 
   let reportArray = [];
-  const week = "Week - {}-{}\n\n".format(startDate, endDate);
-  const linkToUserTwitterAccount = "https://twitter.com/" + twitterClient.getUser().screen_name;
+  let isError = false;
+  const week = "Week --- " + startDate + "---" + endDate + "\n\n";
+  const linkToUserTwitterAccount = "https://twitter.com/" + resultUser.twitterScreenName;
   const fullLinkToTweet = linkToUserTwitterAccount + "/status/";
-  for (let connection in connectionArray) {
+
+  for (let index in connectionArray) {
+    let connection = connectionArray[index];
     const reportName = connection.hashTag + "__" + startDate + "-" + endDate;
     let reportData = "Twitter Campaign\n" + week;
-
-    const tweetsResult = await twitterClient.getHomeTimelineAsync().catch(error => {
-      switch (error.code) {
-        default: {
-          res.status(500).send({
-            code: 500,
-            status: "INTERNAL_SERVER_ERROR",
-            message: "Internal server error"
-          });
-        }
-      }
-    });
-
-    if (typeof tweetsResult === "undefined") {
-      return;
-    }
 
     let tweetArray = [];
     let retweetArray = [];
     let fullLinkToSourceOfRetweet = connection.twitterLink;
 
+    const sinceFormated = await moment(startDate).format("YYYY-MM-DD");
+    const tweetsResult = await twitterClient.get("statuses/user_timeline", { q: "since:2011-07-11" + sinceFormated, count: 100 })
+      .catch(error => {
+        console.log("Error in tweetsResult: ", error);
+        switch (error.code) {
+          default: {
+            res.status(500).send({
+              code: 500,
+              status: "INTERNAL_SERVER_ERROR",
+              message: "Internal server error"
+            });
+          }
+        }
+      });
+
+    // const result = twitterClient.get("account/verify_credentials", { skip_status: true })
+    //   .catch(function (err) {
+    //     console.log("caught error", err.stack);
+    //   })
+    //   .then(function (result) {
+    //     // `result` is an Object with keys "data" and "resp".
+    //     // `data` and `resp` are the same objects as the ones passed
+    //     // to the callback.
+    //     // See https://github.com/ttezel/twit#tgetpath-params-callback
+    //     // for details.
+    //
+    //     console.log("data", result.data);
+    //   });
+
+    if (typeof tweetsResult === "undefined") {
+      return;
+    }
+
     for (let tweet in tweetsResult) {
       let fullLinkToSourceOfRetweet = "";
       const createdAt = moment(tweet.created_at, "dd MMM DD HH:mm:ss ZZ YYYY", "en");
-      const startDateFormated = moment(startDate).format("DD.MM.YYYY");
-      const endDateFormated = moment(endDate).format("DD.MM.YYYY");
+      const startDateFormated = moment(startDate).format("YYYY-MM-DD");
+      const endDateFormated = moment(endDate).format("YYYY-MM-DD");
       if (createdAt >= startDateFormated && createdAt <= endDateFormated) {
         let isRetweet = false;
 
@@ -136,10 +160,15 @@ router.post("/", async (req, res) => {
       }
     }
 
+    if (isError) {
+      return;
+    }
+
+    reportData += "\n\nTweets\n";
     for (let tweet in tweetArray) {
       reportData += fullLinkToTweet + tweet.id;
     }
-    reportData += "\n\nRetweets and Likes\n";
+    reportData += "\n\nRetweets\n";
     for (let retweet in retweetArray) {
       if (typeof (retweet.retweeted_status) !== "undefined") {
         reportData += fullLinkToSourceOfRetweet + "/status/" + retweet.retweeted_status.id_str;
@@ -155,21 +184,36 @@ router.post("/", async (req, res) => {
       "createdAt": new Date()
     }));
   }
-  const reportResult = db.createReport(reportArray)
-    .catch(error => {
-      switch (error.code) {
-        default: {
-          res.status(500).send({
-            code: 500,
-            status: "INTERNAL_SERVER_ERROR",
-            message: "Internal server error"
-          });
-        }
-      }
-    });
 
-  if (typeof (reportResult) !== "undefined") {
-    res.status(200).send(reportResult);
+  if (typeof (reportArray[0]) === "undefined") {
+    res.status(200).send([]);
+  } else {
+    const reportResult = db.createReport(reportArray, req.app.locals.userId)
+      .catch(error => {
+        // console.log("error: ", error);
+        switch (error.errno) {
+          case "ER_DUP_ENTRY": {
+            console.log("Bla:");
+            res.status(409).send({
+              code: 409,
+              status: "CONFLICT",
+              message: "Report with same name already exists"
+            });
+            break;
+          }
+          default: {
+            res.status(500).send({
+              code: 500,
+              status: "INTERNAL_SERVER_ERROR",
+              message: "Internal server error"
+            });
+          }
+        }
+      });
+
+    if (typeof (reportResult) !== "undefined") {
+      res.status(200).send(reportResult);
+    }
   }
 });
 

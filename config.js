@@ -1,7 +1,7 @@
 module.exports = {
   secret: "secret for jwt",
-  apiKey: "85tlTgCiA8zrQDTxXDwPuNdEy",
-  apiSecret: "1axQ15ohlmF0USKOTm5bZLApZP2XnLujr7np0SJ0aqmQPvYUPj",
+  apiKey: "mEdZHKsDkEV2yBZQVpYWx4mV0",
+  apiSecret: "S6AuJGZSkEFMH8OIq1Prj3KijLp8rsEuLaxGWQMzUuZYxBq9L6",
   development: {
     connectionLimit: 50,
     host: "192.168.1.247",

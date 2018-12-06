@@ -63,7 +63,6 @@ router.post("/register", async (req, res) => {
           break;
         }
         default: {
-          console.log("bla");
           res.status(500).send({code: 500, status: "INTERNAL_SERVER_ERROR", message: "Internal server error"});
           break;
         }
