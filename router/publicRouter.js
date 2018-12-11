@@ -20,7 +20,7 @@ router.post("/register", async (req, res) => {
 
   const loginSchema = Joi.object().keys({login: Joi.string().alphanum().min(3).max(30).required()});
 
-  const passwordSchema = Joi.object().keys({password: Joi.string().regex(/^[a-zA-Z0-9]{3,8}$/).required()});
+  const passwordSchema = Joi.object().keys({password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required()});
 
   const loginValidationResult = Joi.validate({login: login}, loginSchema);
   const passwordValidationResult = Joi.validate({password: password}, passwordSchema);
@@ -114,7 +114,7 @@ router.post("/authorize", async (req, res) => {
   const password = req.body.password;
 
   const loginSchema = Joi.object().keys({login: Joi.string().alphanum().min(3).max(30).required()});
-  const passwordSchema = Joi.object().keys({password: Joi.string().regex(/^[a-zA-Z0-9]{3,8}$/).required()});
+  const passwordSchema = Joi.object().keys({password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required()});
 
   const loginValidationResult = Joi.validate({login: login}, loginSchema);
   const passwordValidationResult = Joi.validate({password: password}, passwordSchema);

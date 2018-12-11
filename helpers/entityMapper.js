@@ -64,6 +64,21 @@ const userObjToJson = exports.userObjToJson = (userObj) => {
   }
 };
 
+const userAccountJsonToObj = exports.userAccountJsonToObj = (userAccountJson) => {
+  if (typeof userAccountJson !== "undefined") {
+    // return user credentials object
+    return {
+      userId: userAccountJson.userId,
+      login: userAccountJson.login,
+      startLicense: userAccountJson.startLicense,
+      endLicense: userAccountJson.endLicense,
+      twitterLink: userAccountJson.twitterLink,
+      twitterScreenName: userAccountJson.twitterScreenName,
+      twitterUsername: userAccountJson.twitterUsername
+    };
+  }
+};
+
 const userShortObjToJson = exports.userShortObjToJson = (userObj) => {
   if (typeof userObj !== "undefined") {
     // return user credentials JSON object

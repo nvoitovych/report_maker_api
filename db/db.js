@@ -140,8 +140,9 @@ exports.updateConnectionById = async (connection, connectionId) => {
 };
 
 exports.deleteConnection = async (connectionId) => {
-  const deletedconnectionId = await knex("connection").where({connection_id: connectionId}).del;
-  return true;
+  const deletedConnectionId = await knex("connection").where({connection_id: connectionId}).del();
+  console.log("deletedConnectionId: ", deletedConnectionId);
+  return deletedConnectionId;
 };
 
 exports.updateConnectionById = async (connection, connectionId) => {
@@ -175,11 +176,11 @@ exports.createReport = async (reportArray, userId) => {
 };
 
 exports.deleteReportById = async (reportId) => {
-  const deletedReportId = await knex("report").where({report_id: reportId}).del;
+  const deletedReportId = await knex("report").where({report_id: reportId}).del();
   return true;
 };
 
 exports.deleteAllReports = async (userId) => {
-  const deletedReportsId = await knex("report").where({user_id: userId}).del;
-  return true;
+  const deletedReportsId = await knex("report").where({user_id: userId}).del();
+  return getReportById(deletedReportsId);
 };

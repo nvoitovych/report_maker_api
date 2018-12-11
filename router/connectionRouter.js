@@ -20,7 +20,7 @@ router.get("/", async (req, res) => {
     });
 
   if (typeof resultConnection !== "undefined") {
-    res.status(200).send(converter.resultConnection);
+    res.status(200).send(resultConnection);
   }
 });
 
@@ -59,6 +59,10 @@ router.post("/", async (req, res) => {
     const resultConnection = await db.createConnection(connection)
       .catch(error => {
         switch (error.code) {
+          case "ER_DUP_ENTRY": {
+            res.status(409).send({code: 409, status: "CONFLICT", message: "Connection already exists"});
+            break;
+          }
           default: {
             res.status(500).send({code: 500, status: "INTERNAL_SERVER_ERROR", message: "Internal server error"});
             break;
@@ -67,7 +71,7 @@ router.post("/", async (req, res) => {
       });
 
     if (typeof resultConnection !== "undefined") {
-      res.status(200).send({connectionId: resultConnection.connectionId});
+      res.status(200).send({connectionId: resultConnection[0].connectionId});
     }
   }
 });
@@ -75,7 +79,7 @@ router.post("/", async (req, res) => {
 router.use("/:connectionId", retrieveParams);
 
 router.delete("/:connectionId", async (req, res) => {
-  const resultConnection = await db.deleteConnectionById(req.parentRouterParams.connectionId)
+  const resultConnection = await db.deleteConnection(req.parentRouterParams.connectionId)
     .catch(error => {
       switch (error.code) {
         default: {

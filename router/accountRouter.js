@@ -18,8 +18,14 @@ router.get("/", async (req, res) => {
       }
     });
 
+  // ndCsuA0S00CmUbFMptoNMTw0n
+  // Ew3QmRv2ZNRLc3vrm6pjSMahGV7LFV53wktCj9XU9Hnvjp7eIQ
+
+  console.log("resultUser: ", resultUser);
+  console.log("resultUser: ", converter.userAccountJsonToObj(resultUser));
+
   if (typeof resultUser !== "undefined") {
-    res.status(200).send(converter.userShortArrayForAdminObjToJson(resultUser));
+    res.status(200).send(converter.userAccountJsonToObj(resultUser));
   }
 });
 
